@@ -1,0 +1,74 @@
+apiVersion: 1
+
+datasources:
+  # Prometheus datasource
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+
+  # PostgreSQL Master datasource
+  - name: PostgreSQL-Master
+    type: postgres
+    access: proxy
+    url: postgres-master:5432
+    database: pos_db
+    user: postgres
+    secureJsonData:
+      password: postgres123
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 0
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+    editable: true
+
+  # PostgreSQL Replica 1 datasource
+  - name: PostgreSQL-Replica1
+    type: postgres
+    access: proxy
+    url: postgres-replica1:5432
+    database: pos_db
+    user: postgres
+    secureJsonData:
+      password: postgres123
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 0
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+    editable: true
+
+  # PostgreSQL Replica 2 datasource
+  - name: PostgreSQL-Replica2
+    type: postgres
+    access: proxy
+    url: postgres-replica2:5432
+    database: pos_db
+    user: postgres
+    secureJsonData:
+      password: postgres123
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 0
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+    editable: true
+
+  # PostgreSQL Replica 3 datasource
+  - name: PostgreSQL-Replica3
+    type: postgres
+    access: proxy
+    url: postgres-replica3:5432
+    database: pos_db
+    user: postgres
+    secureJsonData:
+      password: postgres123
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 0
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+    editable: true 

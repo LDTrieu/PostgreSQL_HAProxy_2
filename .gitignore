@@ -1,0 +1,47 @@
+# PostgreSQL Data and Archive
+data/
+archive/
+*.log
+
+# Docker volumes and temp files
+.docker/
+docker-data/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.sql.backup
+
+# Environment files
+.env
+.env.local
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# PostgreSQL specific
+postgresql.conf.backup
+pg_hba.conf.backup
+recovery.conf 

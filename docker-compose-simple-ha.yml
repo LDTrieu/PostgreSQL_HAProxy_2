@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # Patroni PostgreSQL Master
+  # PostgreSQL Master
   postgres-master:
     image: postgres:15
     container_name: postgres-master
@@ -14,29 +14,21 @@ services:
       POSTGRES_REPLICATION_PASSWORD: replicator123
       PGUSER: postgres
       POSTGRES_HOST_AUTH_METHOD: trust
-    command: |
-      bash -c "
-        # Configure postgresql.conf for replication
-        echo \"wal_level = replica\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"max_wal_senders = 10\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"max_replication_slots = 10\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"archive_mode = on\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"archive_command = 'test ! -f /tmp/archive/%f && cp %p /tmp/archive/%f'\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"listen_addresses = '*'\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"port = 5432\" >> /var/lib/postgresql/data/postgresql.conf
-        
-        # Configure pg_hba.conf for replication
-        echo \"host replication replicator 0.0.0.0/0 trust\" >> /var/lib/postgresql/data/pg_hba.conf
-        echo \"host all all 0.0.0.0/0 trust\" >> /var/lib/postgresql/data/pg_hba.conf
-        
-        # Start PostgreSQL
-        docker-entrypoint.sh postgres
-      "
+    command: >
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=10
+      -c max_replication_slots=10
+      -c hot_standby=on
+      -c archive_mode=on
+      -c archive_command='test ! -f /archive/%f && cp %p /archive/%f'
+      -c listen_addresses='*'
+      -c hba_file=/var/lib/postgresql/data/pg_hba.conf
     volumes:
       - ./data/master:/var/lib/postgresql/data
       - ./scripts:/docker-entrypoint-initdb.d
-      - /tmp/archive:/tmp/archive
+      - ./config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./archive:/archive
     ports:
       - "5432:5432"
     networks:
@@ -51,30 +43,25 @@ services:
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres123
-    command: |
+      PGPASSWORD: replicator123
+    command: >
       bash -c "
-        # Wait for master to be ready
         until pg_isready -h postgres-master -p 5432 -U postgres; do
           echo 'Waiting for master...'
           sleep 2
         done
         
-        # Create base backup from master
         rm -rf /var/lib/postgresql/data/*
-        pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -W -R
+        pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -R
         
-        # Configure as replica
-        echo \"primary_conninfo = 'host=postgres-master port=5432 user=replicator password=replicator123'\" >> /var/lib/postgresql/data/postgresql.conf
         echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"port = 5432\" >> /var/lib/postgresql/data/postgresql.conf
-        
-        # Start PostgreSQL in recovery mode
         touch /var/lib/postgresql/data/standby.signal
+        
         postgres
       "
     volumes:
       - ./data/replica1:/var/lib/postgresql/data
-      - /tmp/archive:/tmp/archive
+      - ./archive:/archive
     ports:
       - "5433:5432"
     networks:
@@ -91,30 +78,25 @@ services:
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres123
-    command: |
+      PGPASSWORD: replicator123
+    command: >
       bash -c "
-        # Wait for master to be ready
         until pg_isready -h postgres-master -p 5432 -U postgres; do
           echo 'Waiting for master...'
           sleep 2
         done
         
-        # Create base backup from master
         rm -rf /var/lib/postgresql/data/*
-        pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -W -R
+        pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -R
         
-        # Configure as replica
-        echo \"primary_conninfo = 'host=postgres-master port=5432 user=replicator password=replicator123'\" >> /var/lib/postgresql/data/postgresql.conf
         echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"port = 5432\" >> /var/lib/postgresql/data/postgresql.conf
-        
-        # Start PostgreSQL in recovery mode
         touch /var/lib/postgresql/data/standby.signal
+        
         postgres
       "
     volumes:
       - ./data/replica2:/var/lib/postgresql/data
-      - /tmp/archive:/tmp/archive
+      - ./archive:/archive
     ports:
       - "5434:5432"
     networks:
@@ -131,30 +113,25 @@ services:
     environment:
       PGUSER: postgres
       POSTGRES_PASSWORD: postgres123
-    command: |
+      PGPASSWORD: replicator123
+    command: >
       bash -c "
-        # Wait for master to be ready
         until pg_isready -h postgres-master -p 5432 -U postgres; do
           echo 'Waiting for master...'
           sleep 2
         done
         
-        # Create base backup from master
         rm -rf /var/lib/postgresql/data/*
-        pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -W -R
+        pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -R
         
-        # Configure as replica
-        echo \"primary_conninfo = 'host=postgres-master port=5432 user=replicator password=replicator123'\" >> /var/lib/postgresql/data/postgresql.conf
         echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
-        echo \"port = 5432\" >> /var/lib/postgresql/data/postgresql.conf
-        
-        # Start PostgreSQL in recovery mode
         touch /var/lib/postgresql/data/standby.signal
+        
         postgres
       "
     volumes:
       - ./data/replica3:/var/lib/postgresql/data
-      - /tmp/archive:/tmp/archive
+      - ./archive:/archive
     ports:
       - "5435:5432"
     networks:
@@ -281,7 +258,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.25.0.0/16
 
 volumes:
   grafana-storage:

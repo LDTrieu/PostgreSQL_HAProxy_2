@@ -583,3 +583,20 @@ docker-compose -f docker-compose-simple-ha.yml up -d
 
 **Monitor real-time, test failover, enjoy the automatic healing! 🚀** 
 ``` 
+
+# 1. Clone repo
+git clone <repo-url>
+cd PostgreSQL_HAProxy_2
+
+# 2. Start cluster
+docker-compose -f docker-compose-simple-ha.yml up -d
+
+# 3. Wait for init
+sleep 60
+
+# 4. Monitor
+./enhanced-realtime-monitor.sh
+
+# 5. Test failover
+docker stop postgres-master
+# Watch auto-promotion!

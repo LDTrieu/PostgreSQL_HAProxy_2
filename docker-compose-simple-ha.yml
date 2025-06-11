@@ -54,13 +54,16 @@ services:
         rm -rf /var/lib/postgresql/data/*
         pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -R
         
+        chmod 700 /var/lib/postgresql/data
+        chown -R postgres:postgres /var/lib/postgresql/data
+        
         echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
         touch /var/lib/postgresql/data/standby.signal
         
-        postgres
+        exec gosu postgres postgres
       "
     volumes:
-      - ./data/replica1:/var/lib/postgresql/data
+      - replica1-data:/var/lib/postgresql/data
       - ./archive:/archive
     ports:
       - "5433:5432"
@@ -89,13 +92,16 @@ services:
         rm -rf /var/lib/postgresql/data/*
         pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -R
         
+        chmod 700 /var/lib/postgresql/data
+        chown -R postgres:postgres /var/lib/postgresql/data
+        
         echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
         touch /var/lib/postgresql/data/standby.signal
         
-        postgres
+        exec gosu postgres postgres
       "
     volumes:
-      - ./data/replica2:/var/lib/postgresql/data
+      - replica2-data:/var/lib/postgresql/data
       - ./archive:/archive
     ports:
       - "5434:5432"
@@ -124,13 +130,16 @@ services:
         rm -rf /var/lib/postgresql/data/*
         pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -R
         
+        chmod 700 /var/lib/postgresql/data
+        chown -R postgres:postgres /var/lib/postgresql/data
+        
         echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
         touch /var/lib/postgresql/data/standby.signal
         
-        postgres
+        exec gosu postgres postgres
       "
     volumes:
-      - ./data/replica3:/var/lib/postgresql/data
+      - replica3-data:/var/lib/postgresql/data
       - ./archive:/archive
     ports:
       - "5435:5432"
@@ -262,3 +271,6 @@ networks:
 
 volumes:
   grafana-storage:
+  replica1-data:
+  replica2-data:
+  replica3-data:

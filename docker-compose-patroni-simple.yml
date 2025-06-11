@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  # ETCD for Patroni consensus
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.0
+    container_name: etcd
+    hostname: etcd
+    command: >
+      /usr/local/bin/etcd
+      --data-dir=/etcd-data
+      --name etcd
+      --initial-advertise-peer-urls http://etcd:2380
+      --listen-peer-urls http://0.0.0.0:2380
+      --advertise-client-urls http://etcd:2379
+      --listen-client-urls http://0.0.0.0:2379
+      --initial-cluster etcd=http://etcd:2380
+      --initial-cluster-state new
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    networks:
+      - postgres-ha
+
+  # Patroni Node 1 (using PostgreSQL with Patroni)
+  postgres-node1:
+    image: patroni/patroni:3.0.2
+    container_name: postgres-node1
+    hostname: postgres-node1
+    environment:
+      PATRONI_SCOPE: postgres-ha
+      PATRONI_NAME: postgres-node1
+      PATRONI_ETCD_URL: http://etcd:2379
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: postgres-node1:8008
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-node1:5432
+      PATRONI_POSTGRESQL_DATA_DIR: /var/lib/postgresql/data
+      PATRONI_POSTGRESQL_PGPASS: /tmp/pgpass
+      PATRONI_SUPERUSER_USERNAME: postgres
+      PATRONI_SUPERUSER_PASSWORD: postgres123
+      PATRONI_REPLICATION_USERNAME: replicator
+      PATRONI_REPLICATION_PASSWORD: replicator123
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+      - "8008:8008"
+    volumes:
+      - postgres-node1-data:/var/lib/postgresql/data
+    depends_on:
+      - etcd
+    networks:
+      - postgres-ha
+
+  # Patroni Node 2
+  postgres-node2:
+    image: patroni/patroni:3.0.2
+    container_name: postgres-node2
+    hostname: postgres-node2
+    environment:
+      PATRONI_SCOPE: postgres-ha
+      PATRONI_NAME: postgres-node2
+      PATRONI_ETCD_URL: http://etcd:2379
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: postgres-node2:8008
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-node2:5432
+      PATRONI_POSTGRESQL_DATA_DIR: /var/lib/postgresql/data
+      PATRONI_POSTGRESQL_PGPASS: /tmp/pgpass
+      PATRONI_SUPERUSER_USERNAME: postgres
+      PATRONI_SUPERUSER_PASSWORD: postgres123
+      PATRONI_REPLICATION_USERNAME: replicator
+      PATRONI_REPLICATION_PASSWORD: replicator123
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5433:5432"
+      - "8009:8008"
+    volumes:
+      - postgres-node2-data:/var/lib/postgresql/data
+    depends_on:
+      - etcd
+    networks:
+      - postgres-ha
+
+  # Patroni Node 3
+  postgres-node3:
+    image: patroni/patroni:3.0.2
+    container_name: postgres-node3
+    hostname: postgres-node3
+    environment:
+      PATRONI_SCOPE: postgres-ha
+      PATRONI_NAME: postgres-node3
+      PATRONI_ETCD_URL: http://etcd:2379
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: postgres-node3:8008
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-node3:5432
+      PATRONI_POSTGRESQL_DATA_DIR: /var/lib/postgresql/data
+      PATRONI_POSTGRESQL_PGPASS: /tmp/pgpass
+      PATRONI_SUPERUSER_USERNAME: postgres
+      PATRONI_SUPERUSER_PASSWORD: postgres123
+      PATRONI_REPLICATION_USERNAME: replicator
+      PATRONI_REPLICATION_PASSWORD: replicator123
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5434:5432"
+      - "8010:8008"
+    volumes:
+      - postgres-node3-data:/var/lib/postgresql/data
+    depends_on:
+      - etcd
+    networks:
+      - postgres-ha
+
+  # HAProxy for load balancing
+  haproxy:
+    image: haproxy:2.8
+    container_name: haproxy
+    hostname: haproxy
+    ports:
+      - "5439:5439" # Write port
+      - "5440:5440" # Read port  
+      - "8080:8080" # Stats
+    volumes:
+      - ./config/haproxy-patroni-simple.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - postgres-node1
+      - postgres-node2
+      - postgres-node3
+    networks:
+      - postgres-ha
+
+networks:
+  postgres-ha:
+    driver: bridge
+
+volumes:
+  postgres-node1-data:
+  postgres-node2-data:
+  postgres-node3-data:

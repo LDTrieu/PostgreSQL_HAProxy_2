@@ -1,0 +1,652 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "PostgreSQL HA Cluster - Failover Ready",
+    "tags": ["postgresql", "ha", "replication", "failover"],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "hideControls": false,
+    "graphTooltip": 1,
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"],
+      "time_options": ["5m", "15m", "1h", "6h", "12h", "24h"]
+    },
+    "refresh": "5s",
+    "schemaVersion": 39,
+    "version": 0,
+    "panels": [
+      {
+        "id": 1,
+        "title": "🎯 Cluster Overview - Master/Replica Status",
+        "type": "table",
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P08B8726A6F9294EC"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-master' as pod_name,\n  'MASTER' as expected_role,\n  CASE WHEN pg_is_in_recovery() THEN 'REPLICA' ELSE 'MASTER' END as actual_role,\n  COUNT(*) as product_count,\n  inet_server_addr() as ip_address,\n  CASE WHEN pg_is_in_recovery() THEN '📘' ELSE '🔥' END as status_icon\nFROM pos_product",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource", 
+              "uid": "P8CC35BA9726F8E90"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica1' as pod_name,\n  'REPLICA' as expected_role,\n  CASE WHEN pg_is_in_recovery() THEN 'REPLICA' ELSE 'MASTER' END as actual_role,\n  COUNT(*) as product_count,\n  inet_server_addr() as ip_address,\n  CASE WHEN pg_is_in_recovery() THEN '📘' ELSE '🔥' END as status_icon\nFROM pos_product",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P4E956032969666E7"
+            },
+            "editorMode": "code",
+            "format": "table", 
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica2' as pod_name,\n  'REPLICA' as expected_role,\n  CASE WHEN pg_is_in_recovery() THEN 'REPLICA' ELSE 'MASTER' END as actual_role,\n  COUNT(*) as product_count,\n  inet_server_addr() as ip_address,\n  CASE WHEN pg_is_in_recovery() THEN '📘' ELSE '🔥' END as status_icon\nFROM pos_product",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P1CF95CFA97CB61CD"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica3' as pod_name,\n  'REPLICA' as expected_role,\n  CASE WHEN pg_is_in_recovery() THEN 'REPLICA' ELSE 'MASTER' END as actual_role,\n  COUNT(*) as product_count,\n  inet_server_addr() as ip_address,\n  CASE WHEN pg_is_in_recovery() THEN '📘' ELSE '🔥' END as status_icon\nFROM pos_product",
+            "refId": "D"
+          }
+        ],
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [
+            {
+              "desc": false,
+              "displayName": "actual_role"
+            }
+          ]
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "center",
+              "displayMode": "auto",
+              "inspect": false,
+              "minWidth": 120
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "actual_role"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "MASTER": {
+                          "color": "red",
+                          "index": 0,
+                          "text": "🔥 MASTER"
+                        },
+                        "REPLICA": {
+                          "color": "blue",
+                          "index": 1,
+                          "text": "📘 REPLICA"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "expected_role"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "dark-gray"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "product_count"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "continuous-GrYlRd"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "title": "📊 Products Count - All Nodes",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P08B8726A6F9294EC"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT COUNT(*) as count FROM pos_product",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource", 
+              "uid": "P8CC35BA9726F8E90"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT COUNT(*) as count FROM pos_product",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P4E956032969666E7"
+            },
+            "editorMode": "code", 
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT COUNT(*) as count FROM pos_product",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P1CF95CFA97CB61CD"
+            },
+            "editorMode": "code",
+            "format": "table", 
+            "rawQuery": true,
+            "rawSql": "SELECT COUNT(*) as count FROM pos_product",
+            "refId": "D"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 24,
+          "x": 0,
+          "y": 10
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "orientation": "horizontal",
+          "textMode": "value_and_name",
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "center"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow", 
+                  "value": 20
+                },
+                {
+                  "color": "red", 
+                  "value": 30
+                }
+              ]
+            },
+            "unit": "short"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "A"
+              },
+              "properties": [
+                {
+                  "id": "displayName",
+                  "value": "Master Node"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "red"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "B"
+              },
+              "properties": [
+                {
+                  "id": "displayName",
+                  "value": "Replica 1"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "blue"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "C"
+              },
+              "properties": [
+                {
+                  "id": "displayName",
+                  "value": "Replica 2"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "green"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byFrameRefID",
+                "options": "D"
+              },
+              "properties": [
+                {
+                  "id": "displayName",
+                  "value": "Replica 3"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "orange"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "title": "🚨 Failover Detection & Alerts",
+        "type": "table",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "editorMode": "code",
+            "expr": "pg_up{job=~\"postgres-.*\"}",
+            "format": "table",
+            "refId": "A",
+            "instant": true
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true
+              },
+              "indexByName": {},
+              "renameByName": {
+                "Value": "pg_status",
+                "instance": "node_name",
+                "job": "service",
+                "role": "expected_role"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "health_status",
+              "binary": {
+                "left": "pg_status",
+                "operator": "==",
+                "reducer": "sum", 
+                "right": "1"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "center",
+              "displayMode": "auto",
+              "inspect": false
+            },
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "color": "red",
+                    "index": 0,
+                    "text": "🔴 DOWN"
+                  },
+                  "1": {
+                    "color": "green",
+                    "index": 1,
+                    "text": "🟢 UP"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 0
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "health_status"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "expected_role"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "options": {
+                        "master": {
+                          "color": "red",
+                          "index": 0,
+                          "text": "🔥 MASTER"
+                        },
+                        "replica": {
+                          "color": "blue",
+                          "index": 1,
+                          "text": "📘 REPLICA"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 4,
+        "title": "⏱️ Connection Status & Timing", 
+        "type": "table",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "editorMode": "code",
+            "expr": "time() - process_start_time_seconds{job=~\"postgres-.*\"}",
+            "format": "table",
+            "refId": "A",
+            "instant": true
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true
+              },
+              "indexByName": {},
+              "renameByName": {
+                "Value": "uptime_seconds",
+                "instance": "node_name",
+                "job": "service"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "uptime_hours",
+              "binary": {
+                "left": "uptime_seconds",
+                "operator": "/",
+                "reducer": "sum",
+                "right": "3600"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              }
+            }
+          },
+          {
+            "id": "calculateField", 
+            "options": {
+              "alias": "restart_status",
+              "binary": {
+                "left": "uptime_seconds",
+                "operator": "<",
+                "reducer": "sum",
+                "right": "300"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "center",
+              "displayMode": "auto", 
+              "inspect": false
+            },
+            "mappings": [
+              {
+                "options": {
+                  "1": {
+                    "color": "red",
+                    "index": 0,
+                    "text": "🚨 RECENT_RESTART"
+                  },
+                  "0": {
+                    "color": "green",
+                    "index": 1,
+                    "text": "✅ STABLE"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 1
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "restart_status"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "uptime_hours"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "h"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+} 

@@ -1,6 +1,6 @@
 # PostgreSQL 5-Node HA Cluster with Enhanced Auto-Failover
 
-**Production-Ready PostgreSQL High Availability Setup with Automatic Failover, Split-Brain Resolution và Real-Time Monitoring**
+## LÊ ĐÌNH TRIỀU - N18DCCN229
 
 ## 🎯 Tổng Quan
 

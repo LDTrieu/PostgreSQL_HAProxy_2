@@ -67,25 +67,11 @@ sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-#### CentOS/RHEL:
-```bash
-# Install Docker
-sudo yum install docker docker-compose
-
-# Install PostgreSQL client
-sudo yum install postgresql
-
 # Start Docker
 sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-#### macOS:
-```bash
-# Install Docker Desktop from https://docker.com
-# Install PostgreSQL client
-brew install postgresql
-```
 
 ## 🚀 Quick Start Guide
 
@@ -132,63 +118,6 @@ docker ps
 ## 🎛️ Enhanced Real-Time Monitor
 
 ### 🔥 Main Features
-
-**📊 Real-Time Dashboard:**
-```
-╔══════════════════════════════════════════════════════════════════════════════╗
-║              🔍 Enhanced PostgreSQL HA Monitor + Auto-Failover               ║
-║                         2025-06-12 01:15:30                              ║
-║                            ⚡ AUTO-FAILOVER: ON                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-📦 NODE STATUS:
-═══════════════
-Master   : 🔥 MASTER (15 orders)
-Replica-1: 📘 REPLICA (15 orders)  
-Replica-2: 📘 REPLICA (15 orders)
-Replica-3: 📘 REPLICA (15 orders)
-Replica-4: 📘 REPLICA (15 orders)
-
-📊 CLUSTER SUMMARY:
-═══════════════════
-  🔥 Masters: 1 postgres-master
-  📘 Replicas: 4
-  ❌ Down/Failed: 0
-  🟢 Cluster Health: HEALTHY (5/5 nodes, quorum: 5/5)
-```
-
-### ⚡ Auto-Failover Features
-
-1. **🗳️ Smart Replica Selection**
-   - Chọn replica có nhiều data nhất
-   - Kiểm tra connectivity trước promotion
-   - Retry logic với timeout protection
-
-2. **🔧 Auto Split-Brain Fix**
-   - Detect multiple masters automatically  
-   - Prioritize replica-promoted masters
-   - Graceful demotion hoặc container restart
-
-3. **📱 Interactive Controls**
-   - Press `A`: Toggle auto-failover on/off
-   - Real-time refresh every 2 seconds
-   - Event logging với timestamps
-
-### 🎮 Monitor Usage
-
-```bash
-# Default auto mode (2s refresh)
-./enhanced-realtime-monitor.sh
-
-# Fast mode (1s refresh)  
-./enhanced-realtime-monitor.sh fast
-
-# Manual mode (no auto-failover)
-./enhanced-realtime-monitor.sh manual
-
-# Help
-./enhanced-realtime-monitor.sh help
-```
 
 ## 🧪 Testing Scenarios
 
@@ -481,38 +410,6 @@ archive_mode = on
 archive_command = 'test ! -f /archive/%f && cp %p /archive/%f'
 ```
 
-### 📱 Monitoring & Alerts
-- Set up Grafana alerts for replication lag > 5 seconds
-- Monitor disk space usage
-- Track connection counts
-- Alert on failover events
-- Monitor cluster quorum status
-
-## 📁 Project Structure
-
-```
-PostgreSQL_HAProxy_2/
-├── docker-compose-simple-ha.yml           # 🎯 Main cluster definition
-├── enhanced-realtime-monitor.sh           # 🔥 Enhanced monitoring script
-├── config/
-│   ├── haproxy-simple.cfg                 # HAProxy configuration
-│   └── pg_hba.conf                        # PostgreSQL auth config
-├── scripts/
-│   └── master-init.sql                    # Database initialization
-├── grafana/
-│   ├── datasources/                       # Grafana data sources
-│   └── dashboards/                        # Dashboard definitions
-├── prometheus/
-│   └── prometheus.yml                     # Metrics collection config
-├── data/                                  # PostgreSQL data volumes
-├── archive/                               # WAL archive directory
-├── patroni-setup/                         # Patroni HA alternative (future)
-├── DDL.sql                                # Database schema
-├── check-setup.sh                         # Environment checker
-├── setup-demo-environment.sh              # Demo setup script
-└── README.md                              # This documentation
-```
-
 ## 🎯 Success Criteria
 
 ### ✅ Cluster Health Indicators
@@ -532,57 +429,7 @@ Replica-2: 📘 REPLICA (15 orders)
 Replica-3: 📘 REPLICA (15 orders)
 Replica-4: 📘 REPLICA (15 orders)
 
-📊 CLUSTER SUMMARY:
-═══════════════════
-  🔥 Masters: 1 postgres-master
-  📘 Replicas: 4
-  ❌ Down/Failed: 0
-  🟢 Cluster Health: HEALTHY (5/5 nodes, quorum: 5/5)
-```
 
-### ✅ Failover Test Results
-1. **Stop master** → **Auto-promotion** within 30 seconds
-2. **Split-brain** → **Auto-resolution** immediately  
-3. **Quorum loss** → **Cluster degraded** but stable
-4. **Data consistency** → **No data loss** during failover
-
-## 🚀 Getting Started Checklist
-
-- [ ] **Install Docker & Docker Compose**
-- [ ] **Clone repository**
-- [ ] **Start cluster**: `docker-compose -f docker-compose-simple-ha.yml up -d`
-- [ ] **Wait 60 seconds** for initialization
-- [ ] **Run monitor**: `./enhanced-realtime-monitor.sh`
-- [ ] **Test failover**: Stop master and watch auto-promotion
-- [ ] **Access Grafana**: http://localhost:3000 (admin/admin123)
-- [ ] **Check HAProxy**: http://localhost:8080/stats
-
-## 🆘 Support
-
-### 🐛 Issues & Questions
-1. Check troubleshooting section above
-2. Run health checks: `./enhanced-realtime-monitor.sh`
-3. Check logs: `docker-compose logs`
-4. Create GitHub issue with logs and system info
-
-### 📖 Documentation
-- PostgreSQL HA documentation
-- Docker Compose reference
-- HAProxy configuration guide
-- Grafana dashboard creation
-
----
-
-## 🎉 Happy Clustering!
-
-**Start your PostgreSQL 5-Node HA Cluster now:**
-```bash
-docker-compose -f docker-compose-simple-ha.yml up -d
-./enhanced-realtime-monitor.sh
-```
-
-**Monitor real-time, test failover, enjoy the automatic healing! 🚀** 
-``` 
 
 # 1. Clone repo
 git clone <repo-url>

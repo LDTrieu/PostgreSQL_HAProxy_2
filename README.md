@@ -447,3 +447,16 @@ sleep 60
 # 5. Test failover
 docker stop postgres-master
 # Watch auto-promotion!
+
+# Checl CMD
+
+```PGPASSWORD="postgres" psql -h localhost -p 5439 -U postgres -d postgres -c "SELECT *  FROM pos_order;"  
+```
+
+
+```
+REPLICA1_PORT=5433
+REPLICA2_PORT=5434
+REPLICA3_PORT=5435
+REPLICA4_PORT=5436
+```

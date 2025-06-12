@@ -23,6 +23,7 @@ REPLICA4_PORT=5436
 DB_NAME="postgres"
 DB_USER="postgres"
 DB_PASS="postgres"
+TABLE_NAME="pos_order"  # Tên bảng chính xác
 
 # Refresh interval (default 0.5 seconds for high speed)
 REFRESH_INTERVAL=${1:-0.5}
@@ -100,7 +101,7 @@ get_node_info() {
     local is_in_recovery=$(execute_sql "$container" "SELECT pg_is_in_recovery();" 2>/dev/null)
     local can_write=$(execute_sql "$container" "SELECT CASE WHEN current_setting('transaction_read_only')::boolean THEN 'f' ELSE 't' END;" 2>/dev/null)
     local wal_level=$(execute_sql "$container" "SELECT current_setting('wal_level');" 2>/dev/null)
-    local order_count=$(execute_sql "$container" "SELECT COUNT(*) FROM orders;" 2>/dev/null || echo "0")
+    local order_count=$(execute_sql "$container" "SELECT COUNT(*) FROM $TABLE_NAME;" 2>/dev/null || echo "0")
     
     # Determine role based on multiple factors
     local role="UNKNOWN"
@@ -141,7 +142,7 @@ get_last_orders() {
         return 1
     fi
     
-    local orders=$(execute_sql "$container" "SELECT string_agg(id::text, ',' ORDER BY id DESC) FROM (SELECT id FROM orders ORDER BY id DESC LIMIT 5) t;" 2>/dev/null)
+    local orders=$(execute_sql "$container" "SELECT string_agg(id::text, ',' ORDER BY id DESC) FROM (SELECT id FROM $TABLE_NAME ORDER BY id DESC LIMIT 5) t;" 2>/dev/null)
     echo "${orders:-N/A}"
 }
 

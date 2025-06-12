@@ -3,5 +3,5 @@ failover:
 	
 
 
-streamming:
+stream:
 	./streaming-data-monitor.sh

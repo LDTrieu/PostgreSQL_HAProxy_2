@@ -33,7 +33,7 @@ Hệ thống Cluster PostgreSQL 5 nodes với:
 
  QUORUM: 3/5 nodes needed for master election
  AUTO-FIX: Split-brain detection và automatic resolution
- MONITOR: Real-time cluster health với enhanced dashboard
+ MONITOR: Real-time cluster health với dashboard
 ```
 
 ##  Prerequisites
@@ -95,7 +95,7 @@ docker ps
 
 ### 4. Real-Time Monitoring
 ```bash
-# Start enhanced monitoring dashboard
+# Start monitoring dashboard
 ./enhanced-realtime-monitor.sh
 
 # Auto-failover mode (default)
@@ -105,7 +105,7 @@ docker ps
 ./enhanced-realtime-monitor.sh manual
 ```
 
-##  Enhanced Real-Time Monitor
+##  Real-Time Monitor
 
 ###  Main Features
 

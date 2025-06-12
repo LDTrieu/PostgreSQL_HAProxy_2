@@ -5,12 +5,12 @@
 ##  Tổng Quan
 
 Hệ thống Cluster PostgreSQL 5 nodes với:
-- ** 1 Master + 4 Replicas** - Tối ưu cho quorum (3/5 majority)
-- ** Quorum-Based Elections** - Tránh split-brain scenarios
-- ** Auto-Failover** - Tự động promote replica tốt nhất
-- ** Auto Split-Brain Fix** - Tự động resolve conflicts
-- ** Real-Time Monitoring** - Enhanced dashboard với event logging
-- ** Production-Ready** - Robust error handling và timeouts
+- 1 Master + 4 Replicas - Tối ưu cho quorum (3/5 majority)
+- Quorum-Based Elections - Tránh split-brain scenarios
+- Auto-Failover - Tự động promote replica tốt nhất
+- Auto Split-Brain Fix - Tự động resolve conflicts
+- Real-Time Monitoring - Enhanced dashboard với event logging
+- Production-Ready - Robust error handling và timeouts
 
 ##  Kiến Trúc 5-Node Cluster
 
@@ -35,16 +35,6 @@ Hệ thống Cluster PostgreSQL 5 nodes với:
  AUTO-FIX: Split-brain detection và automatic resolution
  MONITOR: Real-time cluster health với dashboard
 ```
-
-##  Prerequisites
-
-###  Yêu Cầu Hệ Thống
-- **OS**: Linux (Ubuntu 20.04+), macOS
-- **Docker**: 20.10+ 
-- **Docker Compose**: 1.29+
-- **RAM**: Tối thiểu 6GB (8GB recommended)
-- **Disk**: 15GB free space
-- **CPU**: 4 cores recommended
 
 ###  Cài Đặt Dependencies
 
@@ -77,7 +67,7 @@ sudo systemctl enable docker
 
 ### 1. Clone Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/LDTrieu/PostgreSQL_HAProxy_2
 cd PostgreSQL_HAProxy_2
 ```
 
@@ -125,11 +115,9 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 # Terminal 1: Start monitoring
 ./enhanced-realtime-monitor.sh
 
-# Terminal 2: Stop current master
+# Terminal 2: Stop master
 docker stop postgres-master
 
-# Watch automatic promotion in monitor!
-# Best replica will be auto-promoted to master
 ```
 
 ### 3.  Split-Brain Resolution Test
@@ -140,8 +128,6 @@ docker stop postgres-master
 # Terminal 2: Create split-brain
 docker start postgres-master  # If stopped before
 
-# Watch auto-fix in action:
-# Script will detect 2 masters and fix automatically
 ```
 
 ### 4.  Quorum Testing
@@ -149,7 +135,7 @@ docker start postgres-master  # If stopped before
 # Stop 2 nodes (still have 3/5 quorum)
 docker stop postgres-replica1 postgres-replica2
 
-# Monitor shows: "DEGRADED (quorum: 3/5 ✅)"
+# "DEGRADED (quorum: 3/5 ✅)"
 # Cluster still functional
 
 # Stop 1 more (lose quorum)
@@ -157,20 +143,6 @@ docker stop postgres-replica3
 
 # Monitor shows: "DEGRADED - NO QUORUM (2/5 < 3)"
 ```
-
-### 5.  Load Testing
-```bash
-# Connect to write endpoint
-PGPASSWORD=postgres123 psql -h localhost -p 5439 -U postgres -d pos_db
-
-# Insert test data
-INSERT INTO pos_order (customer_name, total_amount, order_date, created_by) 
-VALUES ('Test Customer', 100.00, NOW(), 1);
-
-# Check replication on all nodes
-SELECT COUNT(*) FROM pos_order;
-```
-
 
 ###  Database Schema
 ```sql
@@ -191,8 +163,6 @@ bash -x enhanced-realtime-monitor.sh
 docker ps
 ```
 
-##  Success Criteria
-
 ###  Cluster Health Indicators
 - **5/5 containers running**: All PostgreSQL nodes operational
 - **Quorum maintained**: Minimum 3/5 nodes active
@@ -212,7 +182,7 @@ Replica-4:  REPLICA (15 orders)
 
 
 # 1. Clone repo
-git clone <repo-url>
+git clone https://github.com/LDTrieu/PostgreSQL_HAProxy_2
 cd PostgreSQL_HAProxy_2
 
 # 2. Start cluster

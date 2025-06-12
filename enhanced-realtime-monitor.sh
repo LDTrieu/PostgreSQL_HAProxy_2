@@ -65,7 +65,7 @@ check_and_auto_promote() {
         done
         
         if [ -n "$best_replica" ]; then
-            log_event "🗳️ PROMOTING $best_replica (${max_orders} orders)"
+            log_event "🗳️ PROMOTING $best_replica"
             if timeout 15 docker exec $best_replica psql -U postgres -c "SELECT pg_promote();" >/dev/null 2>&1; then
                 log_event "✅ AUTO-FAILOVER SUCCESS: $best_replica → MASTER"
                 return 0
@@ -141,14 +141,14 @@ check_node_status_enhanced() {
     if [ "$connected" = true ]; then
         case $role in
             "MASTER")
-                echo -e "${RED}🔥 MASTER${NC} ${GREEN}(${orders:-0} orders)${NC}"
+                echo -e "${RED}🔥 MASTER${NC} ${GREEN}${NC}"
                 if [ "$LAST_MASTER" != "$node" ]; then
                     log_event "👑 NEW MASTER DETECTED: $node"
                     LAST_MASTER=$node
                 fi
                 ;;
             "REPLICA")
-                echo -e "${BLUE}📘 REPLICA${NC} ${GREEN}(${orders:-0} orders)${NC}"
+                echo -e "${BLUE}📘 REPLICA${NC} ${GREEN}${NC}"
                 ;;
             *)
                 echo -e "${YELLOW}⚠️ UNKNOWN ROLE${NC}"

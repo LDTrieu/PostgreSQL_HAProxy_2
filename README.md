@@ -81,16 +81,6 @@ git clone <repository-url>
 cd PostgreSQL_HAProxy_2
 ```
 
-### 2. Verify Setup
-```bash
-# Check Docker is running
-docker --version
-docker-compose --version
-
-# Check system resources
-docker system df
-```
-
 ### 3. Start 5-Node Cluster
 ```bash
 # Start full cluster
@@ -181,39 +171,6 @@ VALUES ('Test Customer', 100.00, NOW(), 1);
 SELECT COUNT(*) FROM pos_order;
 ```
 
-##  Configuration Details
-
-###  Container Ports
-| Service | Container | Host Port | Purpose |
-|---------|-----------|-----------|----------|
-| postgres-master | Master DB | 5432 | Read/Write |
-| postgres-replica1 | Replica 1 | 5433 | Read-only |
-| postgres-replica2 | Replica 2 | 5434 | Read-only |
-| postgres-replica3 | Replica 3 | 5435 | Read-only |
-| postgres-replica4 | Replica 4 | 5436 | Read-only |
-| haproxy | Load Balancer | 5439/5440/8080 | Write/Read/Stats |
-| grafana | Dashboard | 3000 | Monitoring |
-| prometheus | Metrics | 9090 | Data Collection |
-
-###  Default Credentials
-```bash
-# PostgreSQL
-Username: postgres
-Password: postgres123
-Database: pos_db
-
-# Grafana  
-Username: admin
-Password: admin123
-
-# Access URLs
-PostgreSQL Master: localhost:5432
-HAProxy Write: localhost:5439
-HAProxy Read: localhost:5440
-HAProxy Stats: http://localhost:8080/stats
-Grafana: http://localhost:3000
-Prometheus: http://localhost:9090
-```
 
 ###  Database Schema
 ```sql
@@ -243,7 +200,6 @@ docker ps
 - **Auto-failover**: < 30 seconds promotion time
 - **Split-brain resolution**: Automatic detection and fix
 
-###  Expected Monitor Output
 ```
  NODE STATUS:
 ═══════════════

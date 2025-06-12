@@ -1,10 +1,10 @@
-# PostgreSQL 5-Node HA Cluster with Enhanced Auto-Failover
+# CSDL_PT
 
 ## LÊ ĐÌNH TRIỀU - N18DCCN229
 
 ## 🎯 Tổng Quan
 
-Hệ thống PostgreSQL HA Cluster 5 nodes với:
+Hệ thống Cluster PostgreSQL 5 nodes với:
 - **🔥 1 Master + 4 Replicas** - Tối ưu cho quorum (3/5 majority)
 - **⚖️ Quorum-Based Elections** - Tránh split-brain scenarios
 - **⚡ Auto-Failover** - Tự động promote replica tốt nhất

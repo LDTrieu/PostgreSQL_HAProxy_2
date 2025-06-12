@@ -1,0 +1,47 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # PostgreSQL Exporters cho từng node
+  - job_name: 'postgres-node1'
+    static_configs:
+      - targets: ['postgres-exporter-node1:9187']
+
+  - job_name: 'postgres-node2'
+    static_configs:
+      - targets: ['postgres-exporter-node2:9187']
+
+  - job_name: 'postgres-node3'
+    static_configs:
+      - targets: ['postgres-exporter-node3:9187']
+
+  - job_name: 'postgres-node4'
+    static_configs:
+      - targets: ['postgres-exporter-node4:9187']
+
+  # Patroni REST API metrics
+  - job_name: 'patroni'
+    static_configs:
+      - targets: 
+        - 'postgres-node1:8008'
+        - 'postgres-node2:8008'
+        - 'postgres-node3:8008'
+        - 'postgres-node4:8008'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # HAProxy stats
+  - job_name: 'haproxy'
+    static_configs:
+      - targets: ['haproxy:8404']
+    metrics_path: '/stats/prometheus'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090'] 

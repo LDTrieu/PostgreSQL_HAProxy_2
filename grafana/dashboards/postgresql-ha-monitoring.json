@@ -1,0 +1,462 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "PostgreSQL HA Cluster Monitoring",
+    "tags": ["postgresql", "ha", "replication"],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "hideControls": false,
+    "graphTooltip": 1,
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h"],
+      "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+    },
+    "templating": {
+      "list": []
+    },
+    "annotations": {
+      "list": []
+    },
+    "refresh": "10s",
+    "schemaVersion": 39,
+    "version": 0,
+    "panels": [
+      {
+        "id": 1,
+        "title": "🎯 Panel 1: Products Count Realtime Comparison",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P08B8726A6F9294EC"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT 'MASTER' as role, COUNT(*) as product_count FROM pos_product",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource", 
+              "uid": "P8CC35BA9726F8E90"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT 'REPLICA1' as role, COUNT(*) as product_count FROM pos_product",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P4E956032969666E7"
+            },
+            "editorMode": "code", 
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT 'REPLICA2' as role, COUNT(*) as product_count FROM pos_product",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P1CF95CFA97CB61CD"
+            },
+            "editorMode": "code",
+            "format": "table", 
+            "rawQuery": true,
+            "rawSql": "SELECT 'REPLICA3' as role, COUNT(*) as product_count FROM pos_product",
+            "refId": "D"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "orientation": "auto",
+          "textMode": "auto",
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red", 
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
+      },
+      {
+        "id": 2,
+        "title": "🎯 Panel 2: Cluster Status Overview",
+        "type": "table",
+        "targets": [
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P08B8726A6F9294EC"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'pos_db' as database_name,\n  'postgres-master' as pod_id,\n  COUNT(*) as product_count,\n  ARRAY_TO_STRING(ARRAY(SELECT product_id::text FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_ids,\n  ARRAY_TO_STRING(ARRAY(SELECT name FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_names,\n  'MASTER' as role,\n  inet_server_addr() as ip_address\nFROM pos_product",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P8CC35BA9726F8E90" 
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'pos_db' as database_name,\n  'postgres-replica1' as pod_id,\n  COUNT(*) as product_count,\n  ARRAY_TO_STRING(ARRAY(SELECT product_id::text FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_ids,\n  ARRAY_TO_STRING(ARRAY(SELECT name FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_names,\n  'REPLICA' as role,\n  inet_server_addr() as ip_address\nFROM pos_product",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P4E956032969666E7"
+            },
+            "editorMode": "code",
+            "format": "table", 
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'pos_db' as database_name,\n  'postgres-replica2' as pod_id,\n  COUNT(*) as product_count,\n  ARRAY_TO_STRING(ARRAY(SELECT product_id::text FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_ids,\n  ARRAY_TO_STRING(ARRAY(SELECT name FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_names,\n  'REPLICA' as role,\n  inet_server_addr() as ip_address\nFROM pos_product",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "grafana-postgresql-datasource",
+              "uid": "P1CF95CFA97CB61CD"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'pos_db' as database_name,\n  'postgres-replica3' as pod_id,\n  COUNT(*) as product_count,\n  ARRAY_TO_STRING(ARRAY(SELECT product_id::text FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_ids,\n  ARRAY_TO_STRING(ARRAY(SELECT name FROM pos_product ORDER BY created_at DESC LIMIT 5), ', ') as last_5_product_names,\n  'REPLICA' as role,\n  inet_server_addr() as ip_address\nFROM pos_product",
+            "refId": "D"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto",
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
+      },
+      {
+        "id": 3,
+        "title": "🎯 Panel 3: Pod Start Time Monitoring",
+        "type": "table",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "editorMode": "code",
+            "expr": "time() - process_start_time_seconds{job=~\"postgres-exporter.*\"}",
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true,
+                "job": false
+              },
+              "indexByName": {},
+              "renameByName": {
+                "Value": "uptime_seconds",
+                "instance": "pod_id",
+                "job": "service"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "start_time",
+              "binary": {
+                "left": "now",
+                "operator": "-",
+                "reducer": "sum",
+                "right": "uptime_seconds"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              }
+            }
+          },
+          {
+            "id": "calculateField", 
+            "options": {
+              "alias": "status",
+              "binary": {
+                "left": "uptime_seconds",
+                "operator": "<",
+                "reducer": "sum",
+                "right": "300"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto", 
+              "inspect": false
+            },
+            "mappings": [
+              {
+                "options": {
+                  "1": {
+                    "text": "RECENT_RESTART"
+                  },
+                  "0": {
+                    "text": "STABLE"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 1
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "status"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 4,
+        "title": "🎯 Panel 4: Master Election Tracking", 
+        "type": "table",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "editorMode": "code",
+            "expr": "pg_replication_is_replica{job=~\"postgres-exporter.*\"}",
+            "format": "table",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "prometheus", 
+              "uid": "PBFA97CFB590B2093"
+            },
+            "editorMode": "code",
+            "expr": "count by (instance) (pg_replication_is_replica{job=~\"postgres-exporter.*\"} == 1)",
+            "format": "table",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true,
+                "job": false
+              },
+              "indexByName": {},
+              "renameByName": {
+                "Value": "is_replica",
+                "instance": "pod_ip",
+                "job": "service"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "election_status",
+              "binary": {
+                "left": "is_replica",
+                "operator": "==",
+                "reducer": "sum", 
+                "right": "0"
+              },
+              "mode": "binary",
+              "reduce": {
+                "reducer": "sum"
+              }
+            }
+          },
+          {
+            "id": "calculateField",
+            "options": {
+              "alias": "elected_time",
+              "mode": "fieldLookup",
+              "reduce": {
+                "reducer": "lastNotNull"
+              },
+              "replaceFields": true
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto",
+              "inspect": false
+            },
+            "mappings": [
+              {
+                "options": {
+                  "1": {
+                    "text": "MASTER"
+                  },
+                  "0": {
+                    "text": "REPLICA"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "election_status"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "overwrite": true
+} 

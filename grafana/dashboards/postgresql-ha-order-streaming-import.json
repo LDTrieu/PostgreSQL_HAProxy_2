@@ -1,0 +1,689 @@
+{
+  "dashboard": {
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": null,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+      {
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-master"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "displayMode": "table",
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "order_count"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "continuous-GrYlRd"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "showHeader": true,
+          "cellHeight": "sm",
+          "footer": {
+            "show": false,
+            "reducer": [
+              "sum"
+            ],
+            "countRows": false
+          }
+        },
+        "pluginVersion": "10.0.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-master"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-master:5432' as node,\n  'MASTER' as role,\n  COUNT(*) as order_count\nFROM pos_order",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica1"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica1:5433' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count\nFROM pos_order",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica2"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica2:5434' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count\nFROM pos_order",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica3"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica3:5435' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count\nFROM pos_order",
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica4"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica4:5436' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count\nFROM pos_order",
+            "refId": "E"
+          }
+        ],
+        "title": "📊 Order Count - All Nodes",
+        "transformations": [
+          {
+            "id": "concatenate",
+            "options": {}
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-master"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "displayMode": "table",
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "uptime_minutes"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "continuous-BlPu"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "id": 2,
+        "options": {
+          "showHeader": true,
+          "cellHeight": "sm",
+          "footer": {
+            "show": false,
+            "reducer": [
+              "sum"
+            ],
+            "countRows": false
+          }
+        },
+        "pluginVersion": "10.0.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-master"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-master:5432' as node,\n  pg_postmaster_start_time() as start_time,\n  EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 as uptime_minutes,\n  CASE \n    WHEN EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 < 5 THEN 'RECENT_START'\n    ELSE 'STABLE' \n  END as status",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica1"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica1:5433' as node,\n  pg_postmaster_start_time() as start_time,\n  EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 as uptime_minutes,\n  CASE \n    WHEN EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 < 5 THEN 'RECENT_START'\n    ELSE 'STABLE' \n  END as status",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica2"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica2:5434' as node,\n  pg_postmaster_start_time() as start_time,\n  EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 as uptime_minutes,\n  CASE \n    WHEN EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 < 5 THEN 'RECENT_START'\n    ELSE 'STABLE' \n  END as status",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica3"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica3:5435' as node,\n  pg_postmaster_start_time() as start_time,\n  EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 as uptime_minutes,\n  CASE \n    WHEN EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 < 5 THEN 'RECENT_START'\n    ELSE 'STABLE' \n  END as status",
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica4"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica4:5436' as node,\n  pg_postmaster_start_time() as start_time,\n  EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 as uptime_minutes,\n  CASE \n    WHEN EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time()))/60 < 5 THEN 'RECENT_START'\n    ELSE 'STABLE' \n  END as status",
+            "refId": "E"
+          }
+        ],
+        "title": "⏰ Node Start Time & Status",
+        "transformations": [
+          {
+            "id": "concatenate",
+            "options": {}
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-master"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "displayMode": "table",
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "order_count"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "continuous-GrYlRd"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "last_5_order_ids"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 300
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        },
+        "id": 3,
+        "options": {
+          "showHeader": true,
+          "cellHeight": "sm",
+          "footer": {
+            "show": false,
+            "reducer": [
+              "sum"
+            ],
+            "countRows": false
+          }
+        },
+        "pluginVersion": "10.0.0",
+        "targets": [
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-master"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-master:5432' as node,\n  'MASTER' as role,\n  COUNT(*) as order_count,\n  (\n    SELECT STRING_AGG(order_id::text, ', ' ORDER BY order_id DESC)\n    FROM (\n      SELECT order_id FROM pos_order ORDER BY order_id DESC LIMIT 5\n    ) recent_orders\n  ) as last_5_order_ids,\n  NOW() as check_time\nFROM pos_order",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica1"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica1:5433' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count,\n  (\n    SELECT STRING_AGG(order_id::text, ', ' ORDER BY order_id DESC)\n    FROM (\n      SELECT order_id FROM pos_order ORDER BY order_id DESC LIMIT 5\n    ) recent_orders\n  ) as last_5_order_ids,\n  NOW() as check_time\nFROM pos_order",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica2"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica2:5434' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count,\n  (\n    SELECT STRING_AGG(order_id::text, ', ' ORDER BY order_id DESC)\n    FROM (\n      SELECT order_id FROM pos_order ORDER BY order_id DESC LIMIT 5\n    ) recent_orders\n  ) as last_5_order_ids,\n  NOW() as check_time\nFROM pos_order",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica3"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica3:5435' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count,\n  (\n    SELECT STRING_AGG(order_id::text, ', ' ORDER BY order_id DESC)\n    FROM (\n      SELECT order_id FROM pos_order ORDER BY order_id DESC LIMIT 5\n    ) recent_orders\n  ) as last_5_order_ids,\n  NOW() as check_time\nFROM pos_order",
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica4"
+            },
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  'postgres-replica4:5436' as node,\n  'REPLICA' as role,\n  COUNT(*) as order_count,\n  (\n    SELECT STRING_AGG(order_id::text, ', ' ORDER BY order_id DESC)\n    FROM (\n      SELECT order_id FROM pos_order ORDER BY order_id DESC LIMIT 5\n    ) recent_orders\n  ) as last_5_order_ids,\n  NOW() as check_time\nFROM pos_order",
+            "refId": "E"
+          }
+        ],
+        "title": "🔄 Streaming Status: Order Count + Last 5 Order IDs",
+        "transformations": [
+          {
+            "id": "concatenate",
+            "options": {}
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-master"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "Order Count",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "opacity",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "smooth",
+              "lineWidth": 3,
+              "pointSize": 6,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 100
+                }
+              ]
+            },
+            "unit": "short",
+            "min": 0
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Master"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#F2495C"
+                  }
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 4
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Replica-1"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#5794F2"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Replica-2"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#73BF69"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Replica-3"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#B877D9"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Replica-4"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "mode": "fixed",
+                    "fixedColor": "#FF9830"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 17
+        },
+        "id": 4,
+        "options": {
+          "legend": {
+            "calcs": [
+              "lastNotNull",
+              "max",
+              "min"
+            ],
+            "displayMode": "table",
+            "placement": "bottom",
+            "showLegend": true,
+            "values": [
+              "value",
+              "max",
+              "min"
+            ]
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "desc"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-master"
+            },
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  $__time(NOW()),\n  COUNT(*) as \"Master\"\nFROM pos_order",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica1"
+            },
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  $__time(NOW()),\n  COUNT(*) as \"Replica-1\"\nFROM pos_order",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica2"
+            },
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  $__time(NOW()),\n  COUNT(*) as \"Replica-2\"\nFROM pos_order",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica3"
+            },
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  $__time(NOW()),\n  COUNT(*) as \"Replica-3\"\nFROM pos_order",
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "postgres",
+              "uid": "postgres-replica4"
+            },
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT \n  $__time(NOW()),\n  COUNT(*) as \"Replica-4\"\nFROM pos_order",
+            "refId": "E"
+          }
+        ],
+        "title": "📈 Order Count - Real-Time Streaming Monitor",
+        "type": "timeseries"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 37,
+    "style": "dark",
+    "tags": [
+      "postgresql",
+      "ha",
+      "streaming",
+      "orders"
+    ],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-5m",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "🔄 PostgreSQL HA - Order Streaming Monitor",
+    "uid": "postgresql-order-streaming",
+    "version": 1,
+    "weekStart": ""
+  },
+  "overwrite": true
+} 

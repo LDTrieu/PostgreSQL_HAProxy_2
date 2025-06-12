@@ -12,6 +12,7 @@ datasources:
   # PostgreSQL Master datasource
   - name: PostgreSQL-Master
     type: postgres
+    uid: postgres-master
     access: proxy
     url: postgres-master:5432
     database: pos_db
@@ -28,6 +29,7 @@ datasources:
   # PostgreSQL Replica 1 datasource
   - name: PostgreSQL-Replica1
     type: postgres
+    uid: postgres-replica1
     access: proxy
     url: postgres-replica1:5432
     database: pos_db
@@ -44,6 +46,7 @@ datasources:
   # PostgreSQL Replica 2 datasource
   - name: PostgreSQL-Replica2
     type: postgres
+    uid: postgres-replica2
     access: proxy
     url: postgres-replica2:5432
     database: pos_db
@@ -60,8 +63,26 @@ datasources:
   # PostgreSQL Replica 3 datasource
   - name: PostgreSQL-Replica3
     type: postgres
+    uid: postgres-replica3
     access: proxy
     url: postgres-replica3:5432
+    database: pos_db
+    user: postgres
+    secureJsonData:
+      password: postgres123
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 0
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+    editable: true
+
+  # PostgreSQL Replica 4 datasource
+  - name: PostgreSQL-Replica4
+    type: postgres
+    uid: postgres-replica4
+    access: proxy
+    url: postgres-replica4:5432
     database: pos_db
     user: postgres
     secureJsonData:

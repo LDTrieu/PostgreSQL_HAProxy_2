@@ -149,6 +149,44 @@ services:
       - postgres-master
     restart: unless-stopped
 
+  # PostgreSQL Replica 4 - NEW NODE for 5-node quorum
+  postgres-replica4:
+    image: postgres:15
+    container_name: postgres-replica4
+    hostname: postgres-replica4
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: postgres123
+      PGPASSWORD: replicator123
+    command: >
+      bash -c "
+        until pg_isready -h postgres-master -p 5432 -U postgres; do
+          echo 'Waiting for master...'
+          sleep 2
+        done
+        
+        rm -rf /var/lib/postgresql/data/*
+        pg_basebackup -h postgres-master -D /var/lib/postgresql/data -U replicator -v -P -R
+        
+        chmod 700 /var/lib/postgresql/data
+        chown -R postgres:postgres /var/lib/postgresql/data
+        
+        echo \"hot_standby = on\" >> /var/lib/postgresql/data/postgresql.conf
+        touch /var/lib/postgresql/data/standby.signal
+        
+        exec gosu postgres postgres
+      "
+    volumes:
+      - replica4-data:/var/lib/postgresql/data
+      - ./archive:/archive
+    ports:
+      - "5436:5432"
+    networks:
+      - postgres-ha
+    depends_on:
+      - postgres-master
+    restart: unless-stopped
+
   # HAProxy Load Balancer
   haproxy:
     image: haproxy:2.8
@@ -167,6 +205,7 @@ services:
       - postgres-replica1
       - postgres-replica2
       - postgres-replica3
+      - postgres-replica4
     restart: unless-stopped
 
   # Prometheus for metrics collection
@@ -242,6 +281,21 @@ services:
       - postgres-replica3
     restart: unless-stopped
 
+  # Postgres Exporter for Replica 4 - NEW
+  postgres-exporter-replica4:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-replica4
+    hostname: postgres-exporter-replica4
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:postgres123@postgres-replica4:5432/pos_db?sslmode=disable"
+    ports:
+      - "9191:9187"
+    networks:
+      - postgres-ha
+    depends_on:
+      - postgres-replica4
+    restart: unless-stopped
+
   # Grafana Dashboard
   grafana:
     image: grafana/grafana:latest
@@ -274,3 +328,4 @@ volumes:
   replica1-data:
   replica2-data:
   replica3-data:
+  replica4-data:

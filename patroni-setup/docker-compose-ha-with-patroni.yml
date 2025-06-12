@@ -1,0 +1,230 @@
+version: "3.8"
+
+networks:
+  postgres-ha:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+volumes:
+  postgres-master-data:
+  postgres-replica1-data:
+  postgres-replica2-data:
+  postgres-replica3-data:
+  etcd-data:
+  grafana-data:
+  prometheus-data:
+
+services:
+  # ETCD for Patroni consensus
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.0
+    container_name: etcd
+    hostname: etcd
+    networks:
+      - postgres-ha
+    environment:
+      ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd:2380
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_INITIAL_CLUSTER: etcd=http://etcd:2380
+      ETCD_INITIAL_CLUSTER_TOKEN: postgres-ha-cluster
+      ETCD_INITIAL_CLUSTER_STATE: new
+    volumes:
+      - etcd-data:/etcd-data
+    command: >
+      /usr/local/bin/etcd
+      --data-dir=/etcd-data
+      --name etcd
+      --initial-advertise-peer-urls http://etcd:2380
+      --listen-peer-urls http://0.0.0.0:2380
+      --advertise-client-urls http://etcd:2379
+      --listen-client-urls http://0.0.0.0:2379
+      --initial-cluster etcd=http://etcd:2380
+      --initial-cluster-state new
+      --initial-cluster-token postgres-ha-cluster
+
+  # PostgreSQL with Patroni - Node 1
+  postgres-node1:
+    image: postgres:14
+    container_name: postgres-node1
+    hostname: postgres-node1
+    networks:
+      postgres-ha:
+        ipv4_address: 172.25.0.10
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: pos_db
+      PATRONI_NAME: postgres-node1
+      PATRONI_SCOPE: postgres-ha
+      PATRONI_ETCD_URL: http://etcd:2379
+      PATRONI_POSTGRESQL_DATA_DIR: /var/lib/postgresql/data
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: postgres-node1:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-node1:5432
+    volumes:
+      - postgres-master-data:/var/lib/postgresql/data
+      - ./scripts/patroni-entrypoint.sh:/docker-entrypoint-initdb.d/patroni-entrypoint.sh
+      - ./scripts/master-init.sql:/docker-entrypoint-initdb.d/master-init.sql
+      - ./config/patroni.yml:/etc/patroni.yml
+    ports:
+      - "5432:5432"
+      - "8008:8008"
+    depends_on:
+      - etcd
+    entrypoint: ["/docker-entrypoint-initdb.d/patroni-entrypoint.sh"]
+
+  # PostgreSQL with Patroni - Node 2
+  postgres-node2:
+    image: postgres:14
+    container_name: postgres-node2
+    hostname: postgres-node2
+    networks:
+      postgres-ha:
+        ipv4_address: 172.25.0.11
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: pos_db
+      PATRONI_NAME: postgres-node2
+      PATRONI_SCOPE: postgres-ha
+      PATRONI_ETCD_URL: http://etcd:2379
+      PATRONI_POSTGRESQL_DATA_DIR: /var/lib/postgresql/data
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: postgres-node2:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-node2:5432
+    volumes:
+      - postgres-replica1-data:/var/lib/postgresql/data
+      - ./scripts/patroni-entrypoint.sh:/docker-entrypoint-initdb.d/patroni-entrypoint.sh
+      - ./config/patroni.yml:/etc/patroni.yml
+    ports:
+      - "5433:5432"
+      - "8009:8008"
+    depends_on:
+      - etcd
+      - postgres-node1
+    entrypoint: ["/docker-entrypoint-initdb.d/patroni-entrypoint.sh"]
+
+  # PostgreSQL with Patroni - Node 3
+  postgres-node3:
+    image: postgres:14
+    container_name: postgres-node3
+    hostname: postgres-node3
+    networks:
+      postgres-ha:
+        ipv4_address: 172.25.0.12
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: pos_db
+      PATRONI_NAME: postgres-node3
+      PATRONI_SCOPE: postgres-ha
+      PATRONI_ETCD_URL: http://etcd:2379
+      PATRONI_POSTGRESQL_DATA_DIR: /var/lib/postgresql/data
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: postgres-node3:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-node3:5432
+    volumes:
+      - postgres-replica2-data:/var/lib/postgresql/data
+      - ./scripts/patroni-entrypoint.sh:/docker-entrypoint-initdb.d/patroni-entrypoint.sh
+      - ./config/patroni.yml:/etc/patroni.yml
+    ports:
+      - "5434:5432"
+      - "8010:8008"
+    depends_on:
+      - etcd
+      - postgres-node1
+    entrypoint: ["/docker-entrypoint-initdb.d/patroni-entrypoint.sh"]
+
+  # PostgreSQL with Patroni - Node 4
+  postgres-node4:
+    image: postgres:14
+    container_name: postgres-node4
+    hostname: postgres-node4
+    networks:
+      postgres-ha:
+        ipv4_address: 172.25.0.13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: pos_db
+      PATRONI_NAME: postgres-node4
+      PATRONI_SCOPE: postgres-ha
+      PATRONI_ETCD_URL: http://etcd:2379
+      PATRONI_POSTGRESQL_DATA_DIR: /var/lib/postgresql/data
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: postgres-node4:8008
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: postgres-node4:5432
+    volumes:
+      - postgres-replica3-data:/var/lib/postgresql/data
+      - ./scripts/patroni-entrypoint.sh:/docker-entrypoint-initdb.d/patroni-entrypoint.sh
+      - ./config/patroni.yml:/etc/patroni.yml
+    ports:
+      - "5435:5432"
+      - "8011:8008"
+    depends_on:
+      - etcd
+      - postgres-node1
+    entrypoint: ["/docker-entrypoint-initdb.d/patroni-entrypoint.sh"]
+
+  # HAProxy with Patroni-aware configuration
+  haproxy:
+    image: haproxy:2.8
+    container_name: haproxy
+    hostname: haproxy
+    networks:
+      postgres-ha:
+        ipv4_address: 172.25.0.20
+    ports:
+      - "5439:5439" # Write port (Master only)
+      - "5440:5440" # Read port (Replicas)
+      - "8080:8080" # Stats
+    volumes:
+      - ./config/haproxy-patroni.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - postgres-node1
+      - postgres-node2
+      - postgres-node3
+      - postgres-node4
+
+  # Monitoring stack remains the same
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    networks:
+      - postgres-ha
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus-patroni.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    hostname: grafana
+    networks:
+      - postgres-ha
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_INSTALL_PLUGINS: grafana-postgresql-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus

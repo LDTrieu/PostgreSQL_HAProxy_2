@@ -1,6 +1,5 @@
-# CSDL_PT
 
-## LÊ ĐÌNH TRIỀU - N18DCCN229
+## LÊ ĐÌNH TRIỀU
 
 ##  Tổng Quan
 
